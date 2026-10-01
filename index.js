@@ -2,7 +2,7 @@ const express = require("express");
 const { connectToMongoDG } = require('./connection');
 const path = require("path");
 const cookieParser = require("cookie-parser");
-const { restrictToLoggedinUseOnly, checkAuth } = require("./middlewares/auth");
+const { checkForAuthentication,restrictTo } = require("./middlewares/auth");
 const URL = require("./models/url");
 
 const staticRoute = require("./routes/staticRouter");
@@ -24,10 +24,11 @@ connectToMongoDG('mongodb://127.0.0.1:27017/short-url');
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(checkForAuthentication);
 
 //Routes
-app.use("/url",restrictToLoggedinUseOnly, urlRoute);
+app.use("/url",restrictTo(["NORMAL", "ADMIN"]), urlRoute);
 app.use("/user", userRoute);
-app.use("/",checkAuth, staticRoute);
+app.use("/", staticRoute);
 
 app.listen(PORT, ()=> console.log(`Server is Listening...\nat port : ${PORT}`));

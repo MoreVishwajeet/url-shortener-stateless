@@ -6,7 +6,7 @@ async function handleGenerateNewShortURL(req, res) {
 
     //pre-check
     const entry = await URL.findOne({redirectURL : body.url});
-    if(entry && req.user._id.equals(entry.createdBy)) return res.render('home', {id : entry.shortId});
+    if(entry && req.user._id === entry.createdBy.toString()) return res.render('home', {id : entry.shortId});
 
     
     if(!body.url) return res.status(400).json({error : "url is required"})
